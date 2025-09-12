@@ -81,7 +81,7 @@ class PatrolPhase(Phase):
 class GameTurn:
 
     # See §5.0 for a description of the phases comprising a turn and stage.
-    
+
     def __init__(self, game: "Game", turn: int):
 
         # Parent game.
@@ -195,6 +195,59 @@ class Team:
         self.players.append(player)
 
 
+class Scenario:
+    """There are multiple starting scenarios described by the rules in §59-64.
+
+    The final scenario is the complete campaign.  The others focus on a
+    specific part of the campaign, a location, or an historical figure.
+
+    Each scenario defines starting forces, deployments, supplies, special
+    rules/variations, and victory conditions."""
+
+    def __init__(self, game: "Game"):
+        self.game = game
+
+    def check_victory(self) -> str|None:
+        """Check if either team has won.
+
+        Returns: None for no result, otherwise a string team name."""
+        return None
+
+
+class TheItaliansGrazianisOffensiveScenario(Scenario):
+    """See §60.0"""
+    pass
+
+class TheItaliansItalianCampaignScenario(Scenario):
+    """See §60.0"""
+    pass
+
+class TheDesertFoxArrivalScenario(Scenario):
+    """See §61.0"""
+    pass
+
+class TheDesertFoxRaceForTobrukScenario(Scenario):
+    """See §61.0"""
+    pass
+
+class OperationCrusaderScenario(Scenario):
+    """See §62.0"""
+    pass
+
+class ElAlameinTheLastChanceScenario(Scenario):
+    """See §63.0"""
+    pass
+
+class ElAlameinTheLongRetreatScenario(Scenario):
+    """See §63.0"""
+    pass
+
+class CampaignForNorthAfricaScenario(Scenario):
+    """See §64.0"""
+    pass
+
+
+
 class Game:
     def __init__(self, server: "Server"):
         self.server = server
@@ -254,6 +307,7 @@ class Server:
 
 
     # Create server
+
     # Create players
     def add_player(self, login: str, name: str):
         player = Player(login, name)
