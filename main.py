@@ -38,44 +38,17 @@ class Phase:
         self.log("phase complete")
 
 
-class NavalConvoySchedulePhase(Phase):
-    pass
+class Segment:
+    def __init__(self, phase: "Phase"):
+        self.phase = phase
 
-class TacticalShippingPhase(Phase):
-    pass
+    def log(self, message: str):
+        self.phase.log(f"[{self.__class__.__name__}] {message}")
 
-class InitiativeDeclarationPhase(Phase):
-    pass
+    def play(self):
+        self.log("segment start")
+        self.log("segment complete")
 
-class WeatherDeterminationPhase(Phase):
-    pass
-
-class OrganizationPhase(Phase):
-    pass
-
-class NavalConvoyArrivalPhase(Phase):
-    pass
-
-class CommonwealthFleetPhase(Phase):
-    pass
-
-class ReserveDesignationPhase(Phase):
-    pass
-
-class MovementAndCombatPhase(Phase):
-    pass
-
-class TruckConvoyMovementPhase(Phase):
-    pass
-
-class CommonwealthRailMovementPhase(Phase):
-    pass
-
-class RepairPhase(Phase):
-    pass
-
-class PatrolPhase(Phase):
-    pass
 
 
 class GameTurn:
@@ -92,12 +65,13 @@ class GameTurn:
         self.turn = turn
         assert 0 <= self.turn < 100
 
-        self.initiative_determination_stage = InitiativeDeterminationStage(self)
-        self.naval_convoy_stage = NavalConvoyStage(self)
-        self.operations_stage1 = OperationsStage(self, 1)
-        self.operations_stage2 = OperationsStage(self, 2)
-        self.operations_stage3 = OperationsStage(self, 3)
-        self.end_of_turn_stage = EndOfTurnStage(self)
+        # Land game.
+        self.initiative_determination_stage = LandGameInitiativeDeterminationStage(self)
+        self.naval_convoy_stage = LandGameNavalConvoyStage(self)
+        self.operations_stage1 = LandGameOperationsStage(self, 1)
+        self.operations_stage2 = LandGameOperationsStage(self, 2)
+        self.operations_stage3 = LandGameOperationsStage(self, 3)
+        self.end_of_turn_stage = LandGameEndOfTurnStage(self)
 
     def log(self, message: str):
         self.game.log(f"[Turn {self.turn}] {message}")
@@ -111,14 +85,17 @@ class GameTurn:
         self.end_of_turn_stage.play()
 
 
-class InitiativeDeterminationStage(Stage):
+################################################################
+# Stages
+
+class LandGameInitiativeDeterminationStage(Stage):
     pass
 
-class NavalConvoyStage(Stage):
+class LandGameNavalConvoyStage(Stage):
     def __init__(self, turn: "GameTurn"):
         super().__init__(turn)
-        self.naval_convoy_schedule_phase = NavalConvoySchedulePhase(self)
-        self.tactical_shipping_phase = TacticalShippingPhase(self)
+        self.naval_convoy_schedule_phase = LandGameNavalConvoySchedulePhase(self)
+        self.tactical_shipping_phase = LandGameTacticalShippingPhase(self)
 
     def play(self):
         self.log("stage start")
@@ -127,22 +104,22 @@ class NavalConvoyStage(Stage):
         self.log("stage complete")
 
 
-class OperationsStage(Stage):
+class LandGameOperationsStage(Stage):
     def __init__(self, turn: "GameTurn", number: int):
         super().__init__(turn)
         self.number = number
 
-        self.initiative_declaration_phase = InitiativeDeclarationPhase(self)
-        self.weather_determination_phase = WeatherDeterminationPhase(self)
-        self.organization_phase = OrganizationPhase(self)
-        self.naval_convoy_arrival_phase = NavalConvoyArrivalPhase(self)
-        self.commonwealth_fleet_phase = CommonwealthFleetPhase(self)
-        self.reserve_designation_phase = ReserveDesignationPhase(self)
-        self.movement_and_combat_phase = MovementAndCombatPhase(self)
-        self.truck_convoy_movement_phase = TruckConvoyMovementPhase(self)
-        self.commonwealth_rail_movement_phase = CommonwealthRailMovementPhase(self)
-        self.repair_phase = RepairPhase(self)
-        self.patrol_phase = PatrolPhase(self)
+        self.initiative_declaration_phase = LangGameInitiativeDeclarationPhase(self)
+        self.weather_determination_phase = LandGameWeatherDeterminationPhase(self)
+        self.organization_phase = LandGameOrganizationPhase(self)
+        self.naval_convoy_arrival_phase = LandGameNavalConvoyArrivalPhase(self)
+        self.commonwealth_fleet_phase = LandGameCommonwealthFleetPhase(self)
+        self.reserve_designation_phase = LandGaneReserveDesignationPhase(self)
+        self.movement_and_combat_phase = LandGameMovementAndCombatPhase(self)
+        self.truck_convoy_movement_phase = LandGameTruckConvoyMovementPhase(self)
+        self.commonwealth_rail_movement_phase = LandGameCommonwealthRailMovementPhase(self)
+        self.repair_phase = LandGameRepairPhase(self)
+        self.patrol_phase = LandGamePatrolPhase(self)
 
     def log(self, message: str):
         self.turn.log(f"[{self.__class__.__name__} {self.number}] {message}")
@@ -163,8 +140,286 @@ class OperationsStage(Stage):
         self.log("stage complete")
 
 
-class EndOfTurnStage(Stage):
+class LandGameEndOfTurnStage(Stage):
     pass
+
+
+class AirGameInitiativeDeterminationStage(Stage):
+    pass
+
+class AirGameStrategicAirPlanningStage(Stage):
+    """Air game, §33.0 p3."""
+    def __init__(self, turn: "GameTurn"):
+        super().__init__(turn)
+
+        self.designation_phase = AirGameDesignationPhase(self)
+        self.axis_malta_availability_phase = AirGameAxisMaltaAvailabilityDeterminationPhase(self)
+        self.strategic_mission_assignment_phase = AirGameStrategicMissionAssignmentPhase(self)
+        self.malta_raid_phase = AirGameMaltaRaidPhase(self)
+
+    def log(self, message: str):
+        self.turn.log(f"[{self.__class__.__name__} {message}")
+
+    def play(self):
+        self.log("stage start")
+        self.designation_phase.play()
+        self.axis_malta_availability_phase.play()
+        self.strategic_mission_assignment_phase.play()
+        self.malta_raid_phase.play()
+        self.log("stage complete")
+
+
+class AirGameNavalConvoyStage(Stage):
+    """Air Game, §33.0 p3."""
+    def __init__(self, turn: "GameTurn"):
+        super().__init__(turn)
+
+        self.naval_convoy_schedule_phase = AirGameNavalConvoySchedulePhase(self)
+        self.convoy_resolution_phase = AirGameConvoyResolutionPhase(self)
+
+    def log(self, message: str):
+        self.turn.log(f"[{self.__class__.__name__}] {message}")
+
+    def play(self):
+        self.log("stage start")
+        self.naval_convoy_schedule_phase.play()
+        self.convoy_resolution_phase.play()
+        self.log("stage complete")
+
+
+class AirGameOperationsStage(Stage):
+    """Air Game, §33.0 p3."""
+    def __init__(self, turn: "GameTurn", number: int):
+        super().__init__(turn)
+        self.number = number
+
+        self.initiative_declaration_phase = AirGameInitiativeDeclarationPhase(self)
+        self.weather_determination_phase = AirGameWeatherDeterminationPhase(self)
+        self.organization_phase = AirGameOrganizationPhase(self)
+        self.naval_convoy_arrival_phase = AirGameNavalConvoyArrivalPhase(self)
+        self.commonwealth_fleet_phase = AirGameCommonwealthFleetPhase(self)
+        self.land_support_air_phase = AirGameLandSupportAirPhase(self)
+        self.reserve_designation_phase = AirGameReserveDesignationPhase(self)
+        self.movement_and_combat_phase = AirGameMovementAndCombatPhase(self)
+        self.truck_convoy_movement_phase = AirGameTruckConvoyMovementPhase(self)
+        self.commonwealth_rail_movement_phase = AirGameCommonwealthRailMovementPhase(self)
+        self.repair_phase = AirGameRepairPhase(self)
+        self.patrol_phase = AirGamePatrolPhase(self)
+
+    def log(self, message: str):
+        self.turn.log(f"[{self.__class__.__name__}] {message}")
+
+    def play(self):
+        self.log("stage start")
+        self.initiative_declaration_phase.play()
+        self.weather_determination_phase.play()
+        self.organization_phase.play()
+        self.naval_convoy_arrival_phase.play()
+        self.commonwealth_fleet_phase.play()
+        self.land_support_air_phase.play()
+        self.reserve_designation_phase.play()
+        self.movement_and_combat_phase.play()
+        self.truck_convoy_movement_phase.play()
+        self.commonwealth_rail_movement_phase.play()
+        self.repair_phase.play()
+        self.patrol_phase.play()
+        self.log("stage complete")
+
+
+class AirGameStrategicAirRecoveryStage(Stage):
+    """Air Game, §33.0 p4."""
+    def __init__(self, turn: "GameTurn"):
+        super().__init__(turn)
+
+        self.return_to_base_phase = AirGameReturnToBasePhase(self)
+        self.aircraft_maintenance_phase = AirGameAircraftMaintenancePhase(self)
+
+    def log(self, message: str):
+        self.turn.log(f"[{self.__class__.__name__}] {message}")
+
+    def play(self):
+        self.log("stage start")
+        self.return_to_base_phase.play()
+        self.aircraft_maintenance_phase.play()
+        self.log("stage complete")
+
+
+class AirGameEndOfTurnStage(Stage):
+    pass
+
+
+
+################################################################
+# Phases
+
+class AirGameDesignationPhase(Phase):
+    """Air Game, §33.0 p3.
+    The Players assign their airplanes to fly Land Support or Strategic missions."""
+    pass
+
+class AirGameAxisMaltaAvailabilityDeterminationPhase(Phase):
+    """Air Game, §33.0 p3.
+    The Axis player determines the amount of support they will receive
+    from their abstracted North African Theatre air force for Raids on Malta."""
+    pass
+
+class AirGameStrategicMissionAssignmentPhase(Phase):
+    """Air Game, §33.0 p3.
+    Planes designated as flying Strategic Missions are assigned.
+    The Axis Player assigns their planes to Raids on Malta or naval convoy protection.
+    The Commonwealth Player assigns their planes to Naval Recon missions or Bombing Reserve."""
+    pass
+
+class AirGameMaltaRaidPhase(Phase):
+    """Air Game, §33.0 p3.
+    The Axis Player resolves flak suppression, anti-aircraft fire and bombing missions
+    against Maltese air facilities.  Note that Commonwealth warships stationed at Valetta
+    may only be attacked by Land Support Missions."""
+    pass
+
+class AirGameNavalConvoySchedulePhase(Phase):
+    """Air Game, §33.0 p3.
+    The Axis Player refers to the Axis Naval Convoy Level Chart and then to the Axis Convoy
+    Capacity Table and rolls one die to determine the total tonnage available for the _next_
+    Game Turn.  They then plan what specific cargoes the convoys will carry and their routes."""
+    pass
+
+class AirGameInitiativeDeclarationPhase(Phase):
+    pass
+
+class AirGameWeatherDeterminationPhase(Phase):
+    pass
+
+class AirGameOrganizationPhase(Phase):
+    pass
+
+class AirGameNavalConvoyArrivalPhase(Phase):
+    pass
+
+class AirGameCommonwealthFleetPhase(Phase):
+    pass
+
+class AirGameLandSupportAirPhase(Phase):
+    pass
+
+class AirGameReserveDesignationPhase(Phase):
+    pass
+
+class AirGameMovementAndCombatPhase(Phase):
+    pass
+
+class AirGameTruckConvoyMovementPhase(Phase):
+    pass
+
+class AirGameCommonwealthRailMovementPhase(Phase):
+    pass
+
+class AirGameRepairPhase(Phase):
+    pass
+
+class AirGamePatrolPhase(Phase):
+    pass
+
+class AirGameReturnToBasePhase(Phase):
+    """Air Game, §33.0 p4.
+    All surviving planes from missions flown in Stage II (Strategic Air Planning Stage)
+    are returned to their base or origin, if possible."""
+    pass
+
+class AirGameAircraftMaintenancePhase(Phase):
+    """Air Game, §33.0 p4.
+    Both players may attempt to ready planes that have flown missions during the Strategic Air Stage."""
+    pass
+
+
+
+class AirGameConvoyResolutionPhase(Phase):
+    """Air Game, §33.0 p3."""
+    def __init__(self, stage: Stage):
+        super().__init__(stage)
+
+        self.naval_convoy_reconnaissance_segment = AirGameNavalConvoyReconnaissanceSegment(self)
+        self.convoy_lane_assignment_segment = AirGameConvoyLanAssignmentSegment(self)
+        self.convoy_bombing_segment = AirGameConvoyBombingSegment(self)
+
+    def log(self, message: str):
+        self.stage.log(f"[{self.__class__.__name__} {message}")
+
+    def play(self):
+        self.log("segment start")
+        self.naval_convoy_reconnaissance_segment.play()
+        self.convoy_lane_assignment_segment.play()
+        self.convoy_bombing_segment.play()
+        self.log("segment complete")
+
+
+class LandGameNavalConvoySchedulePhase(Phase):
+    """Land game (§5.2, p11), Naval Convoy Stage."""
+    pass
+
+class AirGameNavalConvoySchedulePhase(Phase):
+    """Air game (§33.0, p3), Naval Convoy Stage."""
+    pass
+
+class LandGameTacticalShippingPhase(Phase):
+    """Land game, Naval Convoy Stage, §5.2, p12"""
+    pass
+
+class AirGameConvoyResolutionPhase(Phase):
+    """Air game."""
+    pass
+
+
+class LangGameInitiativeDeclarationPhase(Phase):
+    pass
+
+class LandGameWeatherDeterminationPhase(Phase):
+    pass
+
+class LandGameOrganizationPhase(Phase):
+    pass
+
+class LandGameNavalConvoyArrivalPhase(Phase):
+    pass
+
+class LandGameCommonwealthFleetPhase(Phase):
+    pass
+
+class LandGaneReserveDesignationPhase(Phase):
+    pass
+
+class LandGameMovementAndCombatPhase(Phase):
+    pass
+
+class LandGameTruckConvoyMovementPhase(Phase):
+    pass
+
+class LandGameCommonwealthRailMovementPhase(Phase):
+    pass
+
+class LandGameRepairPhase(Phase):
+    pass
+
+class LandGamePatrolPhase(Phase):
+    pass
+
+
+
+################################################################
+# Segments (Air game)
+
+class AirGameNavalConvoyReconnaissanceSegment(Segment):
+    """Air game."""
+    pass
+
+class AirGameConvoyLanAssignmentSegment(Segment):
+    """Air game."""
+    pass
+
+class AirGameConvoyBombingSegment(Segment):
+    """Air game."""
+    pass
+
 
 
 class Queue:
