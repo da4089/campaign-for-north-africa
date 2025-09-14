@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class TimeOfDay(Enum):
-    Unset = 'X'
+    Never = 'X'
     DayOnly = 'D'
     NightOnly = 'N'
     DayOrNight = 'DN'
@@ -24,15 +24,17 @@ class Aircraft:
         self.tactical_air_combat: int = 0
 
         # This is the number of Bomb Points, called tonnage (but not actually in tons),
-        # that a Plane can carry torpedoes that face is listed along with the bombload
-        # capacity.
+        # that a plane can carry.  Torpedoes are listed separately.
         # §34.14
         self.bombload_capacity: int = 0
 
-        # This is the capacity of the plane, given in TOE Strength Points (infantry)
-        # and/or tons of supplies (see case §54.5 for tonnage equivalents).
-        # §34.15
-        self.transport_capacity: int = 0
+        # This is the number of Bomb Points carried by the torpedoes on this plane.
+        self.torpedo_capacity: int = 0
+
+        # Transport capacity is measured in TOE Strength Points (for troops), or tons
+        # (for supplies) (see case §54.5 for tonnage equivalents, §34.15, §4.44A)
+        self.transport_strength: int = 0
+        self.transport_tons: int = 0
 
         # This is a somewhat abstract rating that simulates the ability of a plane to
         # fly faster, higher, and with greater agility than other planes.  Maneuver
@@ -53,25 +55,26 @@ class Aircraft:
         # §34.18
         self.mission_capacity: int = 0
 
-
-        self.is_fighter: bool = False
-        self.is_bomber: bool = False
         self.is_flying_boat: bool = False
-        self.is_transport: bool = False
 
         # Fighter bombers can take either role, but not both on the same mission (§34.21)
         self.flying_as_fighter: bool = False
         self.flying_as_bomber: bool = False
 
-        self.can_bomb: bool = False
+        # Fighters can be daytime or nighttime (§4.44A)
+        self.can_fight: TimeOfDay = TimeOfDay.Never
+
+        # Bombers can be daytime or nighttime (§34.33)
+        self.can_bomb: TimeOfDay = TimeOfDay.Never
 
         # Some planes can strafe (§34.22)
         self.can_strafe: bool = False
 
+        # Some planes can strafe armour too.
         self.can_strafe_armour: bool = False
 
         # Some planes can do reconnaissance (§34.24)
-        self.can_recce: bool = False   # FIXME: is this a mission property?  Or a plane property?
+        self.can_recce: TimeOfDay = TimeOfDay.Never
 
         # Some bombers can also transport troops or supplies (§34.26)
         self.can_transport: bool = False
@@ -79,15 +82,10 @@ class Aircraft:
         # Planes may remain on the ground, ready to scramble in case of enemy attack.
         # Not all planes are eligible for deployment as scramble forces.
         # Some planes can scramble only at night (§37.14, §40.3,  §40.4)
-        self.can_scramble: TimeOfDay = TimeOfDay.Unset
+        self.can_scramble: TimeOfDay = TimeOfDay.Never
 
-        # Different types of bombers (§34.33)
-        self.is_night_bomber: bool = False
-        self.is_dive_bomber: bool = False
-        self.is_torpedo_bomber: bool = False
-
-        # Can function at night (ie. night-fighter or night-bomber) (§4.44A)
-        self.night_capable: bool = False
+        # Bombers cannot initiate combat; fighters can (§4.44A)
+        self.can_initiate_combat: bool = False
 
 
 class BeaufighterMark1F(Aircraft):
@@ -103,9 +101,9 @@ class BeaufighterMark1F(Aircraft):
         self.maneuver = 30
         self.bombload_capacity = 0
         self.fuel_consumption = 3
-        self.is_fighter = True
-        self.night_capable = True
+        self.can_fight = TimeOfDay.DayOrNight
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
 
 class BeaufighterMark6F(Aircraft):
@@ -121,9 +119,9 @@ class BeaufighterMark6F(Aircraft):
         self.maneuver = 31
         self.bombload_capacity = 0
         self.fuel_consumption = 3
-        self.is_fighter = True
-        self.night_capable = True
+        self.can_fight = TimeOfDay.DayOrNight
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
 
 class  BlenheimMaark4F(Aircraft):
@@ -139,9 +137,9 @@ class  BlenheimMaark4F(Aircraft):
         self.maneuver = 30
         self.bombload_capacity = 0
         self.fuel_consumption = 3
-        self.is_fighter = True
-        self.night_capable = True
+        self.can_fight = TimeOfDay.DayOrNight
         self.can_scramble = TimeOfDay.NightOnly
+        self.can_initiate_combat = True
 
 
 class FulmarMark2(Aircraft):
@@ -157,9 +155,9 @@ class FulmarMark2(Aircraft):
         self.maneuver = 29
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
-        self.night_capable = True
+        self.can_fight = TimeOfDay.DayOrNight
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
 
 class GladiatorMark2(Aircraft):
@@ -175,8 +173,9 @@ class GladiatorMark2(Aircraft):
         self.maneuver = 27
         self.bombload_capacity = 0
         self.fuel_consumption = 1  # FIXME: assumed, table column looks empty?!?
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
 
 class HurricaneMark1(Aircraft):
@@ -192,8 +191,9 @@ class HurricaneMark1(Aircraft):
         self.maneuver = 32
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
 
 class HurricaneMark2A(Aircraft):
@@ -210,15 +210,16 @@ class HurricaneMark2A(Aircraft):
         self.maneuver = 36
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
     def add_droptank(self):
         """Add a drop-tank for additional range."""
         self.range = 88
         self.maneuver = 25
         self.fuel_consumption = 2
-        self.can_scramble = TimeOfDay.Unset
+        self.can_scramble = TimeOfDay.Never
 
     def add_bombs(self):
         """Add bombload capacity."""
@@ -226,8 +227,9 @@ class HurricaneMark2A(Aircraft):
         self.maneuver = 33
         self.bombload_capacity = 2
         self.fuel_consumption = 1
-        self.can_scramble = TimeOfDay.Unset
-        self.can_bomb = True
+        self.can_scramble = TimeOfDay.Never
+        self.can_bomb = TimeOfDay.DayOnly
+        self.can_bomb = TimeOfDay.DayOnly
         self.can_strafe = True
 
 
@@ -245,15 +247,16 @@ class HurricaneMark2B(Aircraft):
         self.maneuver = 36
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
     def add_droptank(self):
         """Add a drop-tank for additional range."""
         self.range = 88
         self.maneuver = 25
         self.fuel_consumption = 2
-        self.can_scramble = TimeOfDay.Unset
+        self.can_scramble = TimeOfDay.Never
 
     def add_bombs(self):
         """Add bombload capacity."""
@@ -261,8 +264,8 @@ class HurricaneMark2B(Aircraft):
         self.maneuver = 32
         self.bombload_capacity = 4
         self.fuel_consumption = 1
-        self.can_scramble = TimeOfDay.Unset
-        self.can_bomb = True
+        self.can_scramble = TimeOfDay.Never
+        self.can_bomb = TimeOfDay.DayOnly
         self.can_strafe = True
 
 
@@ -280,15 +283,16 @@ class HurricaneMark2C(Aircraft):
         self.maneuver = 36
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
     def add_droptank(self):
         """Add a drop-tank for additional range."""
         self.range = 86
         self.maneuver = 25
         self.fuel_consumption = 2
-        self.can_scramble = TimeOfDay.Unset
+        self.can_scramble = TimeOfDay.Never
 
     def add_bombs(self):
         """Add bombload capacity."""
@@ -296,8 +300,8 @@ class HurricaneMark2C(Aircraft):
         self.maneuver = 30
         self.bombload_capacity = 6
         self.fuel_consumption = 1
-        self.can_scramble = TimeOfDay.Unset
-        self.can_bomb = True
+        self.can_scramble = TimeOfDay.Never
+        self.can_bomb = TimeOfDay.DayOnly
         self.can_strafe = True
 
 
@@ -315,16 +319,17 @@ class HurricaneMark2D(Aircraft):
         self.maneuver = 33
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
         self.can_strafe_armour = True
+        self.can_initiate_combat = True
 
     def add_droptank(self):
         """Add a drop-tank for additional range."""
         self.range = 90
         self.maneuver = 25
         self.fuel_consumption = 2
-        self.can_scramble = TimeOfDay.Unset
+        self.can_scramble = TimeOfDay.Never
 
 
 class Kittyhawk1(Aircraft):
@@ -340,23 +345,24 @@ class Kittyhawk1(Aircraft):
         self.maneuver = 33
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
     def add_droptank(self):
         self.range = 94
         self.maneuver = 31
         self.bombload_capacity = 2
         self.fuel_consumption = 2
-        self.can_scramble = TimeOfDay.Unset
+        self.can_scramble = TimeOfDay.Never
 
     def add_bombs(self):
         self.range = 60
         self.maneuver = 29
         self.bombload_capacity = 2
         self.fuel_consumption = 1
-        self.can_scramble = TimeOfDay.Unset
-        self.can_bomb = True
+        self.can_scramble = TimeOfDay.Never
+        self.can_bomb = TimeOfDay.DayOnly
         self.can_strafe = True
 
 
@@ -374,20 +380,21 @@ class Kittyhawk2(Aircraft):
         self.bombload_capacity = 0
         self.fuel_consumption = 1
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
     def add_droptank(self):
         self.range = 95
         self.maneuver = 31
         self.fuel_consumption = 2
-        self.can_scramble = TimeOfDay.Unset
+        self.can_scramble = TimeOfDay.Never
 
     def add_bombs(self):
         self.range = 63
         self.maneuver = 30
         self.bombload_capacity = 2
         self.fuel_consumption = 1
-        self.can_scramble = TimeOfDay.Unset
-        self.can_bomb = True
+        self.can_scramble = TimeOfDay.Never
+        self.can_bomb = TimeOfDay.DayOnly
         self.can_strafe = True
 
 
@@ -404,22 +411,23 @@ class Kittyhawk3(Aircraft):
         self.maneuver = 32
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
     def add_droptank(self):
         self.range = 92
         self.maneuver = 30
         self.fuel_consumption = 2
-        self.can_scramble = TimeOfDay.Unset
+        self.can_scramble = TimeOfDay.Never
 
     def add_bombs(self):
         self.range = 60
         self.maneuver = 29
         self.bombload_capacity = 2
         self.fuel_consumption = 1
-        self.can_scramble = TimeOfDay.Unset
-        self.can_bomb = True
+        self.can_scramble = TimeOfDay.Never
+        self.can_bomb = TimeOfDay.DayOnly
         self.can_strafe = True
 
 
@@ -437,6 +445,7 @@ class SeaGladiator(Aircraft):
         self.bombload_capacity = 0
         self.fuel_consumption = 1
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
 
 class Skua2(Aircraft):
@@ -452,8 +461,9 @@ class Skua2(Aircraft):
         self.maneuver = 18
         self.bombload_capacity = 4
         self.fuel_consumption = 1
-        self.is_fighter = True
-        self.can_scramble = TimeOfDay.Unset
+        self.can_fight = TimeOfDay.DayOnly
+        self.can_scramble = TimeOfDay.Never
+        self.can_initiate_combat = True
 
 
 class Spitfire5B(Aircraft):
@@ -469,8 +479,9 @@ class Spitfire5B(Aircraft):
         self.maneuver = 40
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
 
 class Spitfire5C(Aircraft):
@@ -486,14 +497,15 @@ class Spitfire5C(Aircraft):
         self.maneuver = 42
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
     def add_droptank(self):
         self.range = 59
         self.maneuver = 37
         self.fuel_consumption = 2
-        self.can_scramble = TimeOfDay.Unset
+        self.can_scramble = TimeOfDay.Never
 
 
 class Tomahawk(Aircraft):
@@ -509,14 +521,15 @@ class Tomahawk(Aircraft):
         self.maneuver = 32
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
     def add_droptank(self):
         self.range = 75
         self.maneuver = 27
         self.fuel_consumption = 2
-        self.can_scramble = TimeOfDay.Unset
+        self.can_scramble = TimeOfDay.Never
 
 
 class Marlet1(Aircraft):
@@ -532,8 +545,9 @@ class Marlet1(Aircraft):
         self.maneuver = 34
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
-        self.can_scramble = TimeOfDay.Unset
+        self.can_fight = TimeOfDay.DayOnly
+        self.can_scramble = TimeOfDay.Never
+        self.can_initiate_combat = True
 
 
 class C714(Aircraft):
@@ -549,8 +563,9 @@ class C714(Aircraft):
         self.maneuver = 30
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
-        self.can_scramble = TimeOfDay.Unset
+        self.can_fight = TimeOfDay.DayOnly
+        self.can_scramble = TimeOfDay.Never
+        self.can_initiate_combat = True
 
 
 class D520(Aircraft):
@@ -566,8 +581,9 @@ class D520(Aircraft):
         self.maneuver = 3
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
-        self.can_scramble = TimeOfDay.Unset
+        self.can_fight = TimeOfDay.DayOnly
+        self.can_scramble = TimeOfDay.Never
+        self.can_initiate_combat = True
 
 
 class MS406(Aircraft):
@@ -583,7 +599,476 @@ class MS406(Aircraft):
         self.maneuver = 32
         self.bombload_capacity = 0
         self.fuel_consumption = 1
-        self.is_fighter = True
+        self.can_fight = TimeOfDay.DayOnly
         self.can_scramble = TimeOfDay.DayOnly
+        self.can_initiate_combat = True
 
+
+# Commonwealth Bombers
+
+class Albacore(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Fairey"
+        self.model = "Albacore"
+        self.mark = ""
+
+        self.range = 71
+        self.tactical_air_combat = 2
+        self.maneuver = 6
+        self.bombload_capacity = 8
+        self.torpedo_capacity = 8
+        self.fuel_consumption = 1
+        self.can_bomb = TimeOfDay.NightOnly
+        self.can_initiate_combat = False
+
+
+class Anson1(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Avro"
+        self.model = "Anson"
+        self.mark = "I"
+
+        self.range = 71
+        self.tactical_air_combat = 2
+        self.maneuver = 20
+        self.bombload_capacity = 2
+        self.fuel_consumption = 2
+        self.can_recce = TimeOfDay.DayOnly
+        self.can_bomb = TimeOfDay.DayOnly
+        self.can_initiate_combat = False
+
+
+class FlyingFortress(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Boeing"
+        self.model = "B-17 Flying Fortress"
+        self.mark = "D"
+
+        self.tactical_air_combat = 5
+        self.can_initiate_combat = False
+        self.configure_for_bombing()
+
+    def configure_for_transfer(self):
+        self.range = 275
+        self.maneuver = 29
+        self.bombload_capacity = 0
+        self.fuel_consumption = 5
+
+    def configure_for_bombing(self):
+        self.range = 186
+        self.maneuver = 27
+        self.bombload_capacity = 37
+        self.fuel_consumption = 4
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Liberator(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Consolidated"
+        self.model = "B-24/PB4y Liberator"
+        self.mark = "III"
+
+        self.range = 208
+        self.tactical_air_combat = 5
+        self.can_initiate_combat = False
+        self.maneuver = 23
+        self.bombload_capacity = 64
+        self.fuel_consumption = 7
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Mitchell(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "North American"
+        self.model = "B-25 Mitchell"
+        self.mark = "II"
+
+        self.range = 125
+        self.tactical_air_combat = 6
+        self.can_initiate_combat = False
+        self.maneuver = 25
+        self.bombload_capacity = 14
+        self.fuel_consumption = 4
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Marauder(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Martin"
+        self.model = "B-26 Marauder"
+        self.mark = ""
+
+        self.tactical_air_combat = 4
+        self.can_initiate_combat = False
+        self.fuel_consumption = 5
+        self.configure_for_bombing()
+
+    def configure_for_bombing(self):
+        self.range = 46
+        self.maneuver = 25
+        self.bombload_capacity = 25
+        self.can_bomb = TimeOfDay.DayOnly
+
+    def configure_for_transfer(self):
+        self.range = 170
+        self.maneuver = 28
+        self.bombload_capacity = 0
+
+
+class Baltimore(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Glenn Martin"
+        self.model = "A-30 Baltimore"
+        self.mark = "I"
+
+        self.range = 101
+        self.tactical_air_combat = 6
+        self.can_initiate_combat = False
+        self.maneuver = 22
+        self.bombload_capacity = 10
+        self.fuel_consumption = 3
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Beaufort1(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Bristol"
+        self.model = "Beaufort"
+        self.mark = "I"
+
+        self.range = 144
+        self.tactical_air_combat = 2
+        self.can_initiate_combat = False
+        self.maneuver = 24
+        self.bombload_capacity = 0
+        self.torpedo_capacity = 8
+        self.fuel_consumption = 1
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Blenheim1(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Bristol"
+        self.model = "Blenheim"
+        self.mark = "I"
+
+        self.range = 101
+        self.tactical_air_combat = 1
+        self.can_initiate_combat = False
+        self.maneuver = 22
+        self.bombload_capacity = 5
+        self.fuel_consumption = 2
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Blenheim4(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Bristol"
+        self.model = "Blenheim"
+        self.mark = "IV"
+
+        self.range = 131
+        self.tactical_air_combat = 3
+        self.can_initiate_combat = False
+        self.maneuver = 21
+        self.bombload_capacity = 6
+        self.fuel_consumption = 3
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Bombay1(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Bristol"
+        self.model = "Bombay"
+        self.mark = "I"
+
+        self.tactical_air_combat = 1
+        self.can_initiate_combat = False
+        self.can_transport = True
+        self.transport_strength = 1
+        self.transport_tons = 10
+
+    def configure_for_transfer(self):
+        self.range = 203
+        self.maneuver = 6
+        self.bombload_capacity = 0
+        self.fuel_consumption = 2
+        self.can_bomb = TimeOfDay.Never
+
+    def configure_for_bombing(self):
+        self.range = 88
+        self.maneuver = 5
+        self.bombload_capacity = 10
+        self.fuel_consumption = 2
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Boston3(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Douglas"
+        self.model = "Boston"
+        self.mark = "III"
+
+        self.range = 102
+        self.tactical_air_combat = 5
+        self.can_initiate_combat = False
+        self.maneuver = 23
+        self.bombload_capacity = 10
+        self.fuel_consumption = 3
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Halifax2(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Handley-Page"
+        self.model = "Halifax"
+        self.mark = "II"
+
+        self.tactical_air_combat = 5
+        self.can_initiate_combat = False
+        self.fuel_consumption = 6
+        self.can_bomb = TimeOfDay.DayOnly
+
+    def configure_for_long_range(self):
+        self.range = 194
+        self.maneuver = 27
+        self.bombload_capacity = 7
+
+    def configure_for_short_range(self):
+        self.range = 62
+        self.maneuver = 26
+        self.bombload_capacity = 65
+
+
+class Hudson(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Lockheed"
+        self.model = "A-28 Hudson"
+        self.mark = ""
+
+        self.range = 145
+        self.tactical_air_combat = 3
+        self.can_initiate_combat = False
+        self.maneuver = 25
+        self.bombload_capacity = 0
+        self.fuel_consumption = 2
+        self.can_transport = True
+        self.transport_strength = 1
+        self.transport_tons = 10
+
+
+class Lysander(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Westland"
+        self.model = "Lysander"
+        self.mark = "I"
+
+        self.range = 60
+        self.tactical_air_combat = 2
+        self.can_initiate_combat = False
+        self.maneuver = 20
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.can_strafe = True
+        self.can_recce = TimeOfDay.DayOnly
+
+
+class Maryland(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Glenn Martin"
+        self.model = "167 Maryland"
+        self.mark = ""
+
+        self.range = 76
+        self.tactical_air_combat = 3
+        self.can_initiate_combat = False
+        self.maneuver = 20
+        self.bombload_capacity = 9
+        self.fuel_consumption = 3
+        self.can_bomb = TimeOfDay.DayOnly
+        self.can_recce = TimeOfDay.DayOnly
+
+
+class Potez6311(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Potez"
+        self.model = "63.11"
+        self.mark = ""
+
+        self.range = 75
+        self.tactical_air_combat = 5
+        self.can_initiate_combat = False
+        self.maneuver = 26
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.can_recce = TimeOfDay.DayOnly
+
+
+class Sunderland(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Short"
+        self.model = "Sunderland"
+        self.mark = ""
+
+        self.tactical_air_combat = 5
+        self.can_initiate_combat = False
+        self.fuel_consumption = 4
+
+    def configure_for_recce(self):
+        self.range = 238
+        self.maneuver = 7
+        self.bombload_capacity = 0
+        self.can_recce = TimeOfDay.DayOnly
+        self.can_bomb = TimeOfDay.Never
+
+    def configure_for_bombing(self):
+        self.range = 176
+        self.maneuver = 11
+        self.bombload_capacity = 9
+        self.can_recce = TimeOfDay.Never
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class Swordfish1(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Fairey"
+        self.model = "Swordfish"
+        self.mark = "I"
+
+        self.range = 48
+        self.tactical_air_combat = 1
+        self.can_initiate_combat = False
+        self.maneuver = 7
+        self.bombload_capacity = 0
+        self.torpedo_capacity = 8
+        self.fuel_consumption = 2
+        self.can_bomb = TimeOfDay.DayOnly
+
+
+class TigerMoth2(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "de Haviland"
+        self.model = "Tiger Moth"
+        self.mark = "II"
+
+        self.range = 27
+        self.tactical_air_combat = 0
+        self.can_initiate_combat = False
+        self.maneuver = 14
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.can_recce = TimeOfDay.DayOnly
+
+
+class Valentia(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = ""
+        self.model = ""
+        self.mark = ""
+
+        self.range = 32
+        self.tactical_air_combat = 0
+        self.can_initiate_combat = False
+        self.maneuver = 1
+        self.bombload_capacity = 10
+        self.fuel_consumption = 1
+        self.can_bomb = TimeOfDay.DayOnly
+        self.can_transport = True
+        self.transport_strength = 0.25
+        self.transport_tons = 5
+
+
+class Wellington1(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Vickers"
+        self.model = "Wellington"
+        self.mark = "I"
+
+        self.tactical_air_combat = 3
+        self.can_initiate_combat = False
+        self.fuel_consumption = 4
+        self.can_bomb = TimeOfDay.DayOrNight   # FIXME: or night only?
+
+    def configure_for_long_range(self):
+        self.range = 229
+        self.maneuver = 20
+        self.bombload_capacity = 5
+
+    def configure_for_short_range(self):
+        self.range = 108
+        self.maneuver = 18
+        self.bombload_capacity = 23
+
+
+class Wellington4(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Vickers"
+        self.model = "Wellington"
+        self.mark = "IV"
+
+        self.tactical_air_combat = 3
+        self.can_initiate_combat = False
+        self.fuel_consumption = 5
+        self.can_bomb = TimeOfDay.DayOrNight  # FIXME: or night only?
+
+    def configure_for_long_range(self):
+        self.range = 220
+        self.maneuver = 23
+        self.bombload_capacity = 6
+
+    def configure_for_medium_range(self):
+        self.range = 157
+        self.maneuver = 19
+        self.bombload_capacity = 17
+
+    def configure_for_short_range(self):
+        self.range = 126
+        self.maneuver = 18
+        self.bombload_capacity = 23
 
