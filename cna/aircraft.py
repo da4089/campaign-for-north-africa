@@ -1,9 +1,6 @@
 from enum import Enum
 
 
-class PlaneType(Enum):
-    pass
-
 class TimeOfDay(Enum):
     Unset = 'X'
     DayOnly = 'D'
@@ -328,4 +325,265 @@ class HurricaneMark2D(Aircraft):
         self.maneuver = 25
         self.fuel_consumption = 2
         self.can_scramble = TimeOfDay.Unset
+
+
+class Kittyhawk1(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Curtis"
+        self.model = "P-40 Kittyhawk"
+        self.mark = "I"
+
+        self.range = 71
+        self.tactical_air_combat = 4
+        self.maneuver = 33
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.DayOnly
+
+    def add_droptank(self):
+        self.range = 94
+        self.maneuver = 31
+        self.bombload_capacity = 2
+        self.fuel_consumption = 2
+        self.can_scramble = TimeOfDay.Unset
+
+    def add_bombs(self):
+        self.range = 60
+        self.maneuver = 29
+        self.bombload_capacity = 2
+        self.fuel_consumption = 1
+        self.can_scramble = TimeOfDay.Unset
+        self.can_bomb = True
+        self.can_strafe = True
+
+
+class Kittyhawk2(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Curtis"
+        self.model = "P-40 Kittyhawk"
+        self.mark = "II"
+
+        self.range = 72
+        self.tactical_air_combat = 6
+        self.maneuver = 33
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.can_scramble = TimeOfDay.DayOnly
+
+    def add_droptank(self):
+        self.range = 95
+        self.maneuver = 31
+        self.fuel_consumption = 2
+        self.can_scramble = TimeOfDay.Unset
+
+    def add_bombs(self):
+        self.range = 63
+        self.maneuver = 30
+        self.bombload_capacity = 2
+        self.fuel_consumption = 1
+        self.can_scramble = TimeOfDay.Unset
+        self.can_bomb = True
+        self.can_strafe = True
+
+
+class Kittyhawk3(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Curtis"
+        self.model = "P-40 Kittyhawk"
+        self.mark = "III"
+
+        self.range = 68
+        self.tactical_air_combat = 6
+        self.maneuver = 32
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.DayOnly
+
+    def add_droptank(self):
+        self.range = 92
+        self.maneuver = 30
+        self.fuel_consumption = 2
+        self.can_scramble = TimeOfDay.Unset
+
+    def add_bombs(self):
+        self.range = 60
+        self.maneuver = 29
+        self.bombload_capacity = 2
+        self.fuel_consumption = 1
+        self.can_scramble = TimeOfDay.Unset
+        self.can_bomb = True
+        self.can_strafe = True
+
+
+class SeaGladiator(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Gloster"
+        self.model = "Sea Gladiator"
+        self.mark = ""
+
+        self.range = 38
+        self.tactical_air_combat = 2
+        self.maneuver = 27
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.can_scramble = TimeOfDay.DayOnly
+
+
+class Skua2(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Blackburn"
+        self.model = "Skua"
+        self.mark = "II"
+
+        self.range = 76
+        self.tactical_air_combat = 3
+        self.maneuver = 18
+        self.bombload_capacity = 4
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.Unset
+
+
+class Spitfire5B(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Supermarine"
+        self.model = "Spitfire"
+        self.mark = "VB"
+
+        self.range = 39
+        self.tactical_air_combat = 6
+        self.maneuver = 40
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.DayOnly
+
+
+class Spitfire5C(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Supermarine"
+        self.model = "Spitfire"
+        self.mark = "VC"
+
+        self.range = 43
+        self.tactical_air_combat = 8
+        self.maneuver = 42
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.DayOnly
+
+    def add_droptank(self):
+        self.range = 59
+        self.maneuver = 37
+        self.fuel_consumption = 2
+        self.can_scramble = TimeOfDay.Unset
+
+
+class Tomahawk(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Curtis"
+        self.model = "Tomahawk"
+        self.mark = ""
+
+        self.range = 62
+        self.tactical_air_combat = 2
+        self.maneuver = 32
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.DayOnly
+
+    def add_droptank(self):
+        self.range = 75
+        self.maneuver = 27
+        self.fuel_consumption = 2
+        self.can_scramble = TimeOfDay.Unset
+
+
+class Marlet1(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Grumman"
+        self.model = "Marlet"
+        self.mark = "I"
+
+        self.range = 70
+        self.tactical_air_combat = 8
+        self.maneuver = 34
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.Unset
+
+
+class C714(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Caudron"
+        self.model = "C.714"
+        self.mark = ""
+
+        self.range = 49
+        self.tactical_air_combat = 2
+        self.maneuver = 30
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.Unset
+
+
+class D520(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Dewoitine"
+        self.model = "D.520"
+        self.mark = ""
+
+        self.range = 56
+        self.tactical_air_combat = 4
+        self.maneuver = 3
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.Unset
+
+
+class MS406(Aircraft):
+    def __init__(self, aircraft_id):
+        super().__init__(aircraft_id)
+
+        self.manufacturer = "Morane-Saulnier"
+        self.model = "MS406"
+        self.mark = ""
+
+        self.range = 45
+        self.tactical_air_combat = 4
+        self.maneuver = 32
+        self.bombload_capacity = 0
+        self.fuel_consumption = 1
+        self.is_fighter = True
+        self.can_scramble = TimeOfDay.DayOnly
+
 
