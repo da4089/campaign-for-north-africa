@@ -1,13 +1,28 @@
+from enum import Enum
 
 class UnitType(Enum):
-    pass
+    InfantryUnitType = "I"
+    TankUnitType = "TK"
+    RecceUnitType = "R"
+    ArtilleryUnitType = "A"
+    AntiTankUnitType = "AT"
+    AntiAircraftUnitType = "AA"
+    HeadquartersUnitType = "HQ"
+    EngineersUnitType = "E"
+    TankRecoveryUnitType = "R"
+    SquadronGroundSupportUnitType = "SGSU"
+    TruckUnitType = "TR"
+
 
 class UnitClass(Enum):
     pass
 
 
 class Unit:
-    def __init__(self):
+    def __init__(self, name: str, unit_type: UnitType):
+
+        self.name: str = name
+        self.unit_type: UnitType =  unit_type
 
         # See §3.5 for these definitions.
 
@@ -47,6 +62,9 @@ class Unit:
         # Construction quality, ease of maintenance, and unit mechanical competence.
         self.breakdown_adjustment_rating: int = 0
 
+        # Arrival date, according to order of battle, (turn/stage, or "D" for initial deployment).
+        self.arrival_date = "D"
+
 class HeadquartersUnit(Unit):
     def __init__(self):
         self.attached_units = []
@@ -57,3 +75,42 @@ class HeadquartersUnit(Unit):
         return None
 
         
+
+Artillery31stFieldArtilleryUnit = u = Unit("31st Field Artillery Unit", UnitType.ArtilleryUnitType)
+u.basic_morale_rating = +1  # FIXME: shown at "+1(0)" ?
+u.capability_point_allowance = 20
+u.anti_aircraft_rating = 0
+u.barrage_rating = 0
+u.anti_armour_strength = 0
+u.vulnerability = 0
+u.armour_protection_rating = 0
+u.offensive_close_assault_rating = 0
+u.defensive_assault_rating = 0
+u.maximum_toe_strength = 6  # FIXME: comment "May assign up to 5 artillery TOE strength points" ?
+u.arrival_date = "D"
+
+Infantry2ndScotsGuards = u = Unit("2nd Scots Guard", UnitType.InfantryUnitType)
+u.basic_morale_rating = +1
+u.capability_point_allowance = 10
+u.anti_aircraft_rating = 0
+u.barrage_rating = 0
+u.anti_armour_strength = 0
+u.vulnerability = 0
+u.armour_protection_rating = 0
+u.offensive_close_assault_rating = 1
+u.defensive_assault_rating = 2
+u.maximum_toe_strength = 6
+u.arrival_date = "D"
+
+Infantry1stCoyFrenchMotorMarines = u = Unit("1st Coy French Motor Marines", UnitType.InfantryUnitType)
+u.basic_morale_rating = +1
+u.capability_point_allowance = 10  # FIXME: shown as "10+" ?
+u.anti_aircraft_rating = 0
+u.barrage_rating = 0
+u.anti_armour_strength = 0
+u.vulnerability = 0
+u.armour_protection_rating = 0
+u.offensive_close_assault_rating = 1
+u.defensive_assault_rating = 1
+u.maximum_toe_strength = 1
+u.arrival_date = "D"   # See Errata, §4.44b, #3: '3/65' is incorrect, it should be 'D'.
