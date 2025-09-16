@@ -33,7 +33,7 @@ class Aircraft:
 
         # Transport capacity is measured in TOE Strength Points (for troops), or tons
         # (for supplies) (see case §54.5 for tonnage equivalents, §34.15, §4.44A)
-        self.transport_strength: int = 0
+        self.transport_strength: float = 0
         self.transport_tons: int = 0
 
         # This is a somewhat abstract rating that simulates the ability of a plane to
@@ -124,7 +124,7 @@ class BeaufighterMark6F(Aircraft):
         self.can_initiate_combat = True
 
 
-class  BlenheimMaark4F(Aircraft):
+class  BlenheimMark4F(Aircraft):
     def __init__(self, aircraft_id):
         super().__init__(aircraft_id)
 
