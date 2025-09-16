@@ -469,40 +469,6 @@ class Scenario:
         return None
 
 
-class TheItaliansGrazianisOffensiveScenario(Scenario):
-    """See §60.0"""
-    pass
-
-class TheItaliansItalianCampaignScenario(Scenario):
-    """See §60.0"""
-    pass
-
-class TheDesertFoxArrivalScenario(Scenario):
-    """See §61.0"""
-    pass
-
-class TheDesertFoxRaceForTobrukScenario(Scenario):
-    """See §61.0"""
-    pass
-
-class OperationCrusaderScenario(Scenario):
-    """See §62.0"""
-    pass
-
-class ElAlameinTheLastChanceScenario(Scenario):
-    """See §63.0"""
-    pass
-
-class ElAlameinTheLongRetreatScenario(Scenario):
-    """See §63.0"""
-    pass
-
-class CampaignForNorthAfricaScenario(Scenario):
-    """See §64.0"""
-    pass
-
-
-
 class Game:
     def __init__(self, server: "Server"):
         self.server = server
