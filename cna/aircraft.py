@@ -8,6 +8,10 @@ class TimeOfDay(Enum):
     DayOrNight = 'DN'
 
 
+class Pilot:
+    pass
+
+
 class Aircraft:
     def __init__(self, aircraft_id):
         self.aircraft_id = aircraft_id
@@ -87,6 +91,10 @@ class Aircraft:
         # Bombers cannot initiate combat; fighters can (§4.44A)
         self.can_initiate_combat: bool = False
 
+        # Status values.
+        self.is_fueled = False
+        self.is_refitted = False
+        self.is_armed = False
 
 class BeaufighterMark1F(Aircraft):
     def __init__(self, aircraft_id):
