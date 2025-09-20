@@ -35,7 +35,7 @@ The Campaign for North Africa: The Desert War 1940-1943
   * All these types have a matching counter (see the manifest in §4.22
     except Dummy Tanks which don't have a counter (why?)
 * From §3.22:
-  * for Barrage and Aircraft (Straffing and Bombardment) attacks, the
+  * for Barrage and Aircraft (Strafing and Bombardment) attacks, the
     following classes are used:
     * _Infantry_ class
       * Infantry type
@@ -81,3 +81,28 @@ The Campaign for North Africa: The Desert War 1940-1943
 
 ### Combat Units (§3.4)
 ### Unit Characteristics (§3.5)
+
+
+# Game Loop and Interaction
+
+* For each turn, stage, phase, and segment, each player should be prompted to create Actions.
+* Allowed or possible Actions will depend upon the moment in the game
+* Where multiple Actions are allowed, the player must submit a final "done" Action
+* It should be possible to filter both the prompts and allowed Actions according to a player's role
+  * But that could come as a second phase of development: it's not necessary.
+* The prompts should describe the moment, and indicate the class(es) of possible actions
+* Events should also be notified: arriving convoys, combat results, etc.
+  * This could be interspersed with the prompts?
+  * Or, using a TUI, in a separate window?
+* Practically, I think perhaps a web-based game client
+  * Connecting to a game server
+    * FastAPI?
+    * Starlette?
+    * WebSockets?
+  * The UI should probably show
+    * The map
+    * Game time, both turn/stage/phase/segment and historical date
+    * Prompts and events
+    * A way to submit actions
+  
+
