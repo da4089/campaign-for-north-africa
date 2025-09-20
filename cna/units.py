@@ -19,10 +19,11 @@ class UnitClass(Enum):
 
 
 class Unit:
-    def __init__(self, name: str, unit_type: UnitType):
+    def __init__(self, name: str, unit_type: UnitType, abbreviation: str):
 
         self.name: str = name
         self.unit_type: UnitType =  unit_type
+        self.abbreviation: str = abbreviation
 
         # See §3.5 for these definitions.
 
@@ -65,6 +66,35 @@ class Unit:
         # Arrival date, according to order of battle, (turn/stage, or "D" for initial deployment).
         self.arrival_date = "D"
 
+    @staticmethod
+    def create(unit_name: str,
+               unit_type: UnitType,
+               abbreviation: str,
+               basic_morale_rating: int,
+               capability_point_allowance: int,
+               anti_aircraft_rating: int,
+               barrage_rating: int,
+               anti_armour_strength: int,
+               vulnerability: int,
+               armour_protection_rating: int,
+               offensive_close_assault_rating: int,
+               defensive_assault_rating: int,
+               maximum_toe_strength: int,
+               arrival_date: str):
+        u = Unit(unit_name, unit_type, abbreviation)
+        u.basic_morale_rating = basic_morale_rating
+        u.capability_point_allowance = capability_point_allowance
+        u.anti_aircraft_rating = anti_aircraft_rating
+        u.barrage_rating = barrage_rating
+        u.anti_armour_strength = anti_armour_strength
+        u.vulnerability = vulnerability
+        u.armour_protection_rating = armour_protection_rating
+        u.offensive_close_assault_rating = offensive_close_assault_rating
+        u.defensive_assault_rating = defensive_assault_rating
+        u.maximum_toe_strength = maximum_toe_strength
+        u.arrival_date = arrival_date
+        return u
+
 class HeadquartersUnit(Unit):
     def __init__(self):
         self.attached_units = []
@@ -75,42 +105,52 @@ class HeadquartersUnit(Unit):
         return None
 
         
+# 31st Field Artillery Unit, 4th Indian Division (withdrawn mid-December 1940, returned April 1941)
+U_31Fld = Unit.create(
+    "31st Field Artillery Unit", UnitType.ArtilleryUnitType, "31Fld",
+    1, 20, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 6,  "D")
 
-Artillery31stFieldArtilleryUnit = u = Unit("31st Field Artillery Unit", UnitType.ArtilleryUnitType)
-u.basic_morale_rating = +1  # FIXME: shown at "+1(0)" ?
-u.capability_point_allowance = 20
-u.anti_aircraft_rating = 0
-u.barrage_rating = 0
-u.anti_armour_strength = 0
-u.vulnerability = 0
-u.armour_protection_rating = 0
-u.offensive_close_assault_rating = 0
-u.defensive_assault_rating = 0
-u.maximum_toe_strength = 6  # FIXME: comment "May assign up to 5 artillery TOE strength points" ?
-u.arrival_date = "D"
+# 2nd Scots Guard, unassigned British, infantry-type units.  Served under 22nd Guards Brigade.
+U_2SctGds = Unit.create(
+    "2nd Scots Guard", UnitType.InfantryUnitType, "2SctGds",
+    1, 10, 0, 0,
+    0, 0, 0, 1,
+    2, 6, "D")
 
-Infantry2ndScotsGuards = u = Unit("2nd Scots Guard", UnitType.InfantryUnitType)
-u.basic_morale_rating = +1
-u.capability_point_allowance = 10
-u.anti_aircraft_rating = 0
-u.barrage_rating = 0
-u.anti_armour_strength = 0
-u.vulnerability = 0
-u.armour_protection_rating = 0
-u.offensive_close_assault_rating = 1
-u.defensive_assault_rating = 2
-u.maximum_toe_strength = 6
-u.arrival_date = "D"
+# 1st Company French Motor Marine Battalion, unassigned Allied units.
+# FIXME: CPA shown as "10+" ?
+# See Errata, §4.44b, #3: '3/65' is incorrect, it should be 'D'.
+U_1FMM = Unit.create(
+    "1st Coy French Motor Marines", UnitType.InfantryUnitType, "1FMM",
+    1, 10, 0, 0,
+    0, 0, 0, 1,
+    1,  1, "D")
 
-Infantry1stCoyFrenchMotorMarines = u = Unit("1st Coy French Motor Marines", UnitType.InfantryUnitType)
-u.basic_morale_rating = +1
-u.capability_point_allowance = 10  # FIXME: shown as "10+" ?
-u.anti_aircraft_rating = 0
-u.barrage_rating = 0
-u.anti_armour_strength = 0
-u.vulnerability = 0
-u.armour_protection_rating = 0
-u.offensive_close_assault_rating = 1
-u.defensive_assault_rating = 1
-u.maximum_toe_strength = 1
-u.arrival_date = "D"   # See Errata, §4.44b, #3: '3/65' is incorrect, it should be 'D'.
+# 1st Kings Royal Rifle Corps, 7th Armoured Division.
+U_1KRRC = Unit.create(
+    "1st Kings Royal Rifle Corps", UnitType.ArtilleryUnitType, "1KRRC",
+    2, 10, 0, 0,
+    0, 0, 0, 1,
+    2, 6, "D")
+
+# 3rd Coldstream Guards, Unassigned British, infantry-type units.
+U_3CldGds = Unit.create(
+    "3rd Coldstream Guards", UnitType.InfantryUnitType, "3CldGds",
+    1, 10, 0, 0,
+    0, 0, 0, 1,
+    2, 6, "D")
+
+# 4th Royal Horse Artillery, 7th Armoured Division.
+U_4RHA = Unit.create(
+    "4th Royal Horse Artillery", UnitType.ArtilleryUnitType, "4RHA",
+    2, 20, 0, 0,
+    0, 0, 0, 0,
+    0, 6, "D")
+
+U_7Med = Unit.create(
+    "7th Medium  Artillery Regiment", UnitType.ArtilleryUnitType, "7Med",
+    1, 20, 0, 0,
+    0, 0, 0, 0,
+    0, 6, "D")
