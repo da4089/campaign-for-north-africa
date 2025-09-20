@@ -76,6 +76,45 @@ class Hex:
         # A set of features of this hex.
         self.features: set[HexFeature] = set()
 
+        # Map tile.
+        # FIXME: one tile per hex?  Maybe that's excessive?
+        self.tile = None
+
+        # List of land units deployed in this hex.
+        self.units = []
+
+        # Trucks.
+        # FIXME: are these individual trucks, or truck points (= 10 trucks)?
+        self.light_trucks = []
+        self.medium_trucks = []
+        self.heavy_trucks = []
+
+        # Supplies.
+        # See §54.12 (p14 in common charts).  The capacity limits are set by the FeatureType.
+        self.ammo_available: int = 0
+        self.fuel_available: int = 0
+        self.stores_available: int = 0
+        self.water_available: int = 0
+
+        # Does this hex host an air facility?
+        self.has_air_facility: bool = False
+
+        # If it is an air facility, is it for flying boats?
+        self.is_flying_boat_facility: bool = False
+
+        # Maximum number of air squadrons/SGSUs that can be hosted at this facility.
+        self.max_squadron_capacity_level: int = 0
+
+        # Current air squadron capacity level.
+        self.squadron_capacity_level: int = 0
+
+        # List of aircraft based at this facility.
+        self.aircraft = []
+
+        # List of abandoned vehicles in this hex (§53.32)
+        self.abandoned_vehicles = []
+
+
     def set_terrain(self, terrain_type: TerrainType):
         self.terrain_type = terrain_type
 
@@ -124,6 +163,9 @@ class Map:
         return h
 
 
+
+
+
 def init_map(m: Map) -> Map:
     """Initialize the game map."""
 
@@ -135,7 +177,7 @@ def init_map(m: Map) -> Map:
     m.add_hex("A0103", TerrainType.RockGravel)
     m.add_hex("A0104", TerrainType.RockGravel)
     m.add_hex("A0105", TerrainType.RockGravel)
-    m.add_hex("A0106", TerrainType.RockGravel).add_feature(FeatureType.Wadi, [HexEdge.East, HexEdge.NorthEast])
+    m.add_hex("A0106", TerrainType.RockGravel)
     m.add_hex("A0107", TerrainType.RockGravel)
     m.add_hex("A0108", TerrainType.RockGravel)
     m.add_hex("A0109", TerrainType.RockGravel)
