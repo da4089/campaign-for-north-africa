@@ -1,6 +1,6 @@
 from .units import U_1KRRC
 
-from .units import Unit, U_2SctGds, U_1FMM, U_31Fld, U_3CldGds, U_4RHA, U_1KRRC, U_7Med
+from .units import *
 from .map import HexRef
 
 class Deployment:
@@ -63,9 +63,9 @@ class CampaignForNorthAfricaScenario(Scenario):
             Deployment('C2926',
                        [U_3CldGds, U_1KRRC, U_4RHA, U_7Med],
                        0, 15, 5),
-            Deployment('C3721', [],
+            Deployment('C3721', [U_1RNF, U_3RHA],
                        5, 5, 0),
-            Deployment('C3520', [],
+            Deployment('C3520', [U_1RTR],
                        0, 5, 0),
             Deployment('C3320', [],
                        0, 10, 0),

@@ -154,3 +154,36 @@ U_7Med = Unit.create(
     1, 20, 0, 0,
     0, 0, 0, 0,
     0, 6, "D")
+
+# 1st Royal Northumberland Fusiliers Motor Guard Battalion
+U_1RNF = Unit.create(
+    "1st Royal Northumberland Fusiliers",  UnitType.InfantryUnitType, "1RNF",
+    1, 8, 0, 0,
+    0,  0,0,4,
+    6, 3, "D")
+
+# 3rd Royal Horse Artillery, 7th Armoured Division
+# FIXME: "May assign up to 8 anti-tank TOE strength points" ???
+# FIXME:  6 x 2-pounders
+# FIXME: 7Spt/7 (I think this means: attached to  7th Support Group HQ, which is in turn attached to the 7th Armoured Division?
+# FIXME: 7th Support Group was re-designated 7th Motor Brigade in Feb 1942.   The counter should be replaced at this point.  Arrival date shown as "2/68" (2 OpStage, 68th turn?)
+U_3RHA = Unit.create(
+    "3rd Royal Horse Artillery", UnitType.ArtilleryUnitType, "3RHA",
+    2,  15, 0, 0,
+    0, 0, 0, 0,
+    0, 6, "D")
+
+# 1st Royal Tank Regiment
+# FIXME: "later assigned to the 22nd Armoured Brigade." ... so?  Any game impact?
+# FIXME: 7 x A9 weapons
+# FIXME: "May assign up to ten tank TOE strength points"
+# FIXME: "If the unit is comprised entirely of US tank TOE strength points, its maximum TOE strength is 9 points. See Commonwealth Tank and Gun Characteristics Chart.
+# FIXME: "7/7" ... so, 7th Armoured Division?  Why the slash?
+U_1RTR = Unit.create(
+    "1st Royal Tank Regiment", UnitType.TankUnitType, "1RTR",
+    25, 0, 0, 0,
+    9, 9, 0, 0,
+    0, 10, "D")
+
+
+
